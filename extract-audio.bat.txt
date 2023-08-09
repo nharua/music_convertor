@@ -1,0 +1,48 @@
+REM This script will check all MP4 files in the current folder
+REM and process them to extract audio into separate files (M4A).
+REM The audio files use the same file name as the original video file, with a number, and the M4A extension
+REM This is a batch file, to be run on Windows, in Command Line. 
+REM For Linux, see the "extract-audio.sh" gist below
+REM In this example, there are 2 audio tracks, which get split out to 2 separate audio files.
+REM The original video file remains unchanged.
+REM If you want have a video file with more than 2 audio tracks, 
+REM just add more "-map 0:a:0 -c copy "%~na audio track 1.m4a"" sections:
+REM -map 0:a:0 -c copy "%~na audio track 1.m4a" 
+REM -map 0:a:1 -c copy "%~na audio track 2.m4a" 
+REM -map 0:a:2 -c copy "%~na audio track 3.m4a" 
+REM -map 0:a:3 -c copy "%~na audio track 4.m4a" 
+REM etc ...
+
+REM TO RUN THIS SCRIPT:
+REM You MUST HAVE ffmpeg INSTALLED!
+REM How to install ffmpeg is beyond the scope of this script. Google it.
+REM Either copy all this text into a text file and save it under the name "extract-audio.bat", on your Desktop for example.
+REM Or, download this gist and save it under the name "extract-audio.bat" on your Desktop, for example.
+REM If you save this file into your C:\Windows folder, 
+REM you will be able to run it just by using the script name, "extract-audio.bat"
+REM Otherwise, you will have to provide the full path (or location) of the file when you run it: 
+REM "C:\Users\Username\Desktop\extract-audio.bat"
+REM To use the script, open a Command Prompt window, navigate to the folder that has the MP4 files you want to process, and run it:
+REM "cd C:\Users\Username\Videos"
+REM "C:\Users\Username\Desktop\extract-audio.bat"
+REM
+REM If you just want to run the command directly, and not the batch file, 
+REM please REMEMBER to change the variable name from %%a to a single %a, in all instances where the variable is used!
+
+for /f "delims=*" %%a in ('dir /b .\*.mp4'); do ffmpeg -hide_banner -n -threads 8 -i "%%a" -vn -map 0:a:0 -c copy "%%~na audio track 1.m4a" -map 0:a:1? -c copy "%%~na audio track 2.m4a"
+
+REM for /f %%a in = this is a the loop section that will look for files to process, 
+REM %%a = this is the variable that will be subsctituted with the actual file name when the for loop executes
+REM ('dir .\*.mp4') = this command looks for MP4 files in the current folder
+REM do ffmpeg = this part actually executes ffmpeg and tells it to extract the audio fro the MP4 files it finds.
+REM -hide_banner = hides the info banner when the command is executed.
+REM -n = option to not overwrite existing files
+REM -threads 8 = option to use 8 separate CPU threads for the work. You can increase the number depending on your CPU.
+REM -i "%%a" = this option defines the input file
+REM -vn = this option means no video to be copied
+REM -map 0:a:0 = this options maps the first available audio track to be extracted
+REM -map 0:a:1 = this options maps the second available audio track to be extracted
+REM  ? = this option will avoid an error if there are no multiple audio tracks in a file.
+REM -c copy = this option means please copy the audio without altering it
+REM %~na = this expression is used to get file name only, no extension
+REM "%~na audio track 1.m4a" = the filename of the extracted audio track
